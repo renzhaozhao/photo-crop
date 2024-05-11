@@ -1,5 +1,7 @@
+import { supabase } from '@/utils/supabase'
 import { Button } from 'antd'
 import { useEffect, useRef, useState } from 'react'
+import { v4 as uuid } from 'uuid'
 
 const Photograph = () => {
   const [resultVisible, setResultVisible] = useState(false)
@@ -48,7 +50,23 @@ const Photograph = () => {
     }
     canvasRef.current.toBlob((blob) => {
       console.log(blob)
+      handleUpload(blob!)
     })
+  }
+
+  const handleUpload = async (blob: Blob) => {
+    console.log('Uploading...')
+
+    const { data, error } = await supabase.storage
+      .from('image')
+      .upload(`${uuid()}.png`, blob)
+
+    if (error) {
+      console.error('Error uploading: ', error.message)
+      return
+    }
+
+    console.log(data)
   }
 
   return (
